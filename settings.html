@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>QQ秀设置</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:#f1f2f6;color:#15171c;
+  min-height:100vh;
+  display:flex;justify-content:center;padding:18px 0;
+}
+img{display:block}
+.card{
+  position:relative;width:min(430px,100vw);
+  background:#f1f2f6;border-radius:24px;overflow:hidden;
+  box-shadow:0 18px 50px rgba(20,40,80,.12);
+  display:flex;flex-direction:column;
+  min-height:880px;
+}
+
+/* 状态栏 */
+.status{
+  height:46px;padding:14px 26px 0;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-size:15px;font-weight:700;background:#f1f2f6;
+}
+.status .ic{letter-spacing:2px;font-size:13px}
+
+/* 导航 */
+.nav{
+  height:52px;display:flex;align-items:center;justify-content:center;
+  position:relative;background:#f1f2f6;
+}
+.back{position:absolute;left:14px;font-size:32px;font-weight:200;line-height:1;background:none;border:0;color:#15171c;cursor:pointer}
+.title{font-size:17px;font-weight:700}
+
+/* 分组小标题 */
+.group-label{
+  font-size:12px;color:#8e93a1;font-weight:500;
+  padding:18px 22px 6px;
+}
+.group-label:first-of-type{padding-top:8px}
+.group-label b{color:#5f6672;font-weight:800}
+
+/* 卡片 */
+.group{
+  margin:0 14px 4px;
+  background:#fff;border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 1px 3px rgba(20,30,50,.04);
+}
+
+/* 行 */
+.row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;min-height:50px;
+  border-bottom:1px solid #f1f2f6;
+  cursor:pointer;transition:background .12s;
+  position:relative;
+}
+.row:last-child{border-bottom:none}
+.row:active{background:#f7f8fc}
+.row-l{flex:1;min-width:0;padding-right:12px}
+.row-t{font-size:15px;font-weight:500;color:#15171c;line-height:1.3}
+.row-s{font-size:11px;color:#8e93a1;margin-top:3px;line-height:1.4;font-weight:400}
+.row-r{flex:none;display:flex;align-items:center;gap:4px}
+.row .cnt{font-size:14px;color:#8e93a1}
+.row .arr{font-size:20px;color:#c2c8d2;font-weight:300;line-height:1}
+
+/* iOS 开关 */
+.ios-switch{
+  width:46px;height:28px;border-radius:14px;
+  background:#d8dde6;
+  position:relative;flex:none;
+  transition:background .18s;
+  cursor:pointer;
+}
+.ios-switch::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:24px;height:24px;border-radius:50%;
+  background:#fff;
+  box-shadow:0 2px 4px rgba(20,30,50,.15);
+  transition:left .18s;
+}
+.ios-switch.on{background:#0a84ff}
+.ios-switch.on::after{left:20px}
+
+/* 子项缩进（沿用截图 "— 不在这些好友聊天中展示" 风格）*/
+.row.sub .row-t{padding-left:22px;font-weight:400;color:#3c4048;font-size:14px}
+.row.sub .row-t::before{content:'—';position:absolute;left:16px;color:#8e93a1;font-weight:400}
+.row.sub{position:relative}
+/* 子项禁用态（父开关关闭时）*/
+.row.sub.disabled{opacity:.5;pointer-events:none}
+
+/* 拉黑行 */
+.row.blocked .row-t{color:#ff5a3a}
+
+/* 模式说明小标 */
+.mode-tag{
+  display:inline-block;background:#f0f4ff;color:#0a56b5;
+  font-size:10px;font-weight:800;border-radius:6px;
+  padding:2px 6px;margin-left:6px;vertical-align:middle;
+}
+.mode-tag.whitelist{background:#fff0e8;color:#a13d10}
+
+/* ===== 达人状态卡 ===== */
+.talent-status{
+  margin:0 14px 4px;
+  background:linear-gradient(135deg,#fff0d2,#ffe1a8);
+  border:1.5px solid #ffb74d;border-radius:14px;
+  padding:14px;
+}
+.ts-row{display:flex;align-items:center;gap:12px}
+.ts-icon{
+  width:44px;height:44px;border-radius:50%;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex:none;
+  box-shadow:0 3px 8px rgba(180,120,40,.15);
+}
+.ts-info{flex:1;min-width:0}
+.ts-title{font-size:14px;font-weight:900;color:#0a3d6a;line-height:1.3}
+.ts-title .lvl{background:#ff5a3a;color:#fff;border-radius:5px;padding:1px 6px;font-size:10.5px;font-weight:900;margin-left:5px;vertical-align:middle}
+.ts-sub{font-size:11px;color:#a06b30;margin-top:3px}
+.ts-action{
+  background:#fff;color:#a06b30;border-radius:14px;
+  padding:8px 14px;font-size:12px;font-weight:900;
+  box-shadow:0 2px 6px rgba(180,120,40,.1);
+  flex:none;cursor:pointer;border:0;
+}
+.ts-action.exit{background:#ff5a3a;color:#fff;box-shadow:0 3px 8px rgba(255,90,58,.25)}
+
+/* ===== 邀请/退出弹窗 ===== */
+.invite-mask{
+  position:fixed;inset:0;background:rgba(20,30,50,.5);
+  display:none;align-items:center;justify-content:center;
+  z-index:99;padding:0 20px;
+}
+.invite-mask.on{display:flex}
+.invite-card{
+  background:#fff;border-radius:20px;padding:22px 20px;
+  width:100%;max-width:340px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.ic-title{font-size:17px;font-weight:900;color:#0a3d6a;text-align:center;margin-bottom:14px}
+.ic-title.exit{color:#ff5a3a}
+.ic-cond{background:#f7f8fc;border-radius:12px;padding:12px;margin-bottom:12px}
+.ic-cond .cond{font-size:12.5px;color:#3c4048;font-weight:700;padding:4px 0}
+.ic-cond .cond b{color:#0a56b5}
+.ic-warn{
+  font-size:12px;color:#a13d10;background:#fff0e8;
+  border-radius:10px;padding:10px;margin-bottom:14px;line-height:1.6;
+}
+.ic-warn b{color:#ff5a3a}
+.ic-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ic-cancel{
+  background:#f4f5f8;color:#3c4048;border-radius:18px;
+  padding:11px;font-size:14px;font-weight:800;border:0;cursor:pointer;
+}
+.ic-confirm{
+  background:linear-gradient(100deg,#5aa9ff,#0a84ff);color:#fff;
+  border-radius:18px;padding:11px;font-size:14px;font-weight:900;
+  border:0;cursor:pointer;
+  box-shadow:0 4px 12px rgba(10,132,255,.3);
+}
+.ic-confirm.exit{background:linear-gradient(100deg,#ff8a5a,#ff5a3a);box-shadow:0 4px 12px rgba(255,90,58,.3)}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:60px;transform:translateX(-50%) scale(.95);
+  background:rgba(20,30,50,.92);color:#fff;
+  padding:9px 18px;border-radius:22px;
+  font-size:13px;font-weight:700;z-index:99;
+  opacity:0;pointer-events:none;
+  transition:.25s ease;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="status">
+    <span>9:00</span>
+    <span class="ic">▮▮ ◉ ▰</span>
+    <span>68</span>
+  </div>
+
+  <div class="nav">
+    <button class="back" aria-label="返回">‹</button>
+    <div class="title">QQ秀设置</div>
+  </div>
+
+  <!-- ============ 分组 1：仅我可见的位置（原有）============ -->
+  <div class="group-label">仅我可见的位置</div>
+  <div class="group">
+    <div class="row">
+      <div class="row-l"><div class="row-t">首页左上角</div></div>
+      <div class="ios-switch on" data-key="home"></div>
+    </div>
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">侧边栏</div>
+        <div class="row-s">点击首页左上角进入的页面</div>
+      </div>
+      <div class="ios-switch on" data-key="side"></div>
+    </div>
+  </div>
+
+  <!-- ============ 分组 2：好友可见的位置（原有）============ -->
+  <div class="group-label">好友可见的位置</div>
+  <div class="group">
+    <div class="row">
+      <div class="row-l"><div class="row-t">个人资料页</div></div>
+      <div class="ios-switch on" data-key="profile"></div>
+    </div>
+    <div class="row">
+      <div class="row-l"><div class="row-t">在线状态</div></div>
+      <div class="ios-switch on" data-key="online"></div>
+    </div>
+    <div class="row">
+      <div class="row-l"><div class="row-t">QQ空间</div></div>
+      <div class="ios-switch on" data-key="qzone"></div>
+    </div>
+    <div class="row">
+      <div class="row-l"><div class="row-t">聊天对话</div></div>
+      <div class="ios-switch on" data-key="chat"></div>
+    </div>
+    <div class="row sub">
+      <div class="row-l"><div class="row-t">不在这些好友聊天中展示</div></div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+    <div class="row sub">
+      <div class="row-l"><div class="row-t">不在这些群聊中展示</div></div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 分组 3：好友秀场权限（3 项）============ -->
+  <div class="group-label">好友秀场权限 <span class="mode-tag">默认全开 · 选人例外</span></div>
+  <div class="group">
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">好友秀场</div>
+        <div class="row-s">不让这些好友看到我的秀场</div>
+      </div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">抓走我</div>
+        <div class="row-s">不让这些好友抓走我</div>
+      </div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+    <div class="row talent-entry" id="talentEntry">
+      <div class="row-l">
+        <div class="row-t">加入达人榜</div>
+        <div class="row-s">点赞 Top 100 可加入 · 形象在达人 Tab 公开展示</div>
+      </div>
+      <div class="row-r"><span class="cnt" id="talentState">未加入</span><span class="arr">›</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 新增分组 4：群友权限（默认关 · 白名单制）============ -->
+  <div class="group-label">群友权限 · 半熟 <span class="mode-tag whitelist">默认关 · 选人允许</span></div>
+  <div class="group">
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">群友能看我的群秀场</div>
+        <div class="row-s">关闭后群友 Tab 中我不出现在群秀场</div>
+      </div>
+      <div class="ios-switch on" data-key="g-show"></div>
+    </div>
+    <div class="row sub" data-parent="g-show">
+      <div class="row-l"><div class="row-t">不让这些群看我的群秀场</div></div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">群友能抓我</div>
+        <div class="row-s">开启后每日限 3 次 · 保护期 30 分钟</div>
+      </div>
+      <div class="ios-switch" data-key="g-grab"></div>
+    </div>
+    <div class="row sub disabled" data-parent="g-grab">
+      <div class="row-l"><div class="row-t">仅允许这些群友抓我</div></div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">群友能偷我的能量</div>
+        <div class="row-s">开启后每日限 3 次</div>
+      </div>
+      <div class="ios-switch" data-key="g-steal"></div>
+    </div>
+    <div class="row sub disabled" data-parent="g-steal">
+      <div class="row-l"><div class="row-t">仅允许这些群友偷我能量</div></div>
+      <div class="row-r"><span class="cnt">0 个</span><span class="arr">›</span></div>
+    </div>
+    <div class="row">
+      <div class="row-l"><div class="row-t">群友能邀请我进 TA 的场</div></div>
+      <div class="ios-switch on" data-key="g-invite"></div>
+    </div>
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">群友能加我好友</div>
+        <div class="row-s">关闭后群友无法发起好友申请</div>
+      </div>
+      <div class="ios-switch on" data-key="g-friend"></div>
+    </div>
+  </div>
+
+  <!-- ============ 分组 5：达人榜（只有一个开关）============ -->
+  <div class="group-label">达人榜 <span class="mode-tag whitelist">点赞 Top 100</span></div>
+
+  <!-- 达人榜状态卡 -->
+  <div class="talent-status">
+    <!-- 未加入 -->
+    <div class="ts-row" id="tsNotTalent">
+      <div class="ts-icon">⭐</div>
+      <div class="ts-info">
+        <div class="ts-title">未加入达人榜</div>
+        <div class="ts-sub">我的排名 <b style="color:#ff5a3a">第 68 名</b> · 12.3w 赞</div>
+      </div>
+      <button class="ts-action" id="inviteBtn">加入</button>
+    </div>
+    <!-- 已加入 -->
+    <div class="ts-row" id="tsIsTalent" style="display:none">
+      <div class="ts-icon">⭐</div>
+      <div class="ts-info">
+        <div class="ts-title">已加入达人榜 <span class="lvl">第 68 名</span></div>
+        <div class="ts-sub">12.3w 赞 · 形象已在达人 Tab 公开</div>
+      </div>
+      <button class="ts-action exit" id="exitBtn">退出</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">加入达人榜</div>
+        <div class="row-s">形象在达人 Tab 公开展示给所有人 · 掉出 Top 100 自动下架</div>
+      </div>
+      <div class="ios-switch" data-key="t-join" id="talentSwitch"></div>
+    </div>
+  </div>
+
+  <!-- ============ 新增分组 6：陌生人（无选人 · 仅分类总开关）============ -->
+  <div class="group-label">陌生人 <span class="mode-tag whitelist">匿名 · 仅总开关</span></div>
+  <div class="group">
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">陌生人能看到我的公开形象</div>
+        <div class="row-s">关闭后陌生人仅看到默认剪影</div>
+      </div>
+      <div class="ios-switch on" data-key="s-visible"></div>
+    </div>
+    <div class="row">
+      <div class="row-l"><div class="row-t">允许陌生人加我好友</div></div>
+      <div class="ios-switch on" data-key="s-friend"></div>
+    </div>
+  </div>
+
+  <!-- ============ 新增分组 7：黑名单 ============ -->
+  <div class="group-label">黑名单</div>
+  <div class="group">
+    <div class="row blocked">
+      <div class="row-l">
+        <div class="row-t">我的黑名单</div>
+        <div class="row-s">拉黑后对方完全不可见我的秀场 / 形象 / 加好友</div>
+      </div>
+      <div class="row-r"><span class="cnt">3 人</span><span class="arr">›</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 新增分组 8：被作用保护 ============ -->
+  <div class="group-label">被作用保护</div>
+  <div class="group">
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">隐身模式</div>
+        <div class="row-s">开启后我在所有 Tab 中隐身，仅自己可见</div>
+      </div>
+      <div class="ios-switch" data-key="ghost"></div>
+    </div>
+    <div class="row">
+      <div class="row-l">
+        <div class="row-t">一键拒绝所有互动</div>
+        <div class="row-s">开启后所有"抓 / 偷 / 邀请"对我失效</div>
+      </div>
+      <div class="ios-switch" data-key="deny"></div>
+    </div>
+  </div>
+
+  <div style="height:30px"></div>
+
+</div>
+
+<!-- 加入达人榜确认（精简） -->
+<div class="invite-mask" id="inviteMask">
+  <div class="invite-card">
+    <div class="ic-title">⭐ 加入达人榜</div>
+    <div class="ic-cond">
+      <div class="cond">🏅 我的排名：<b>第 68 名</b>（12.3w 赞）</div>
+      <div class="cond">🏆 按<b>点赞数</b>排序 · 每日 0 点更新</div>
+    </div>
+    <div class="ic-warn">加入后你的形象将在达人 Tab <b>公开展示给所有人</b>，可随时退出。</div>
+    <div class="ic-btns">
+      <button class="ic-cancel" id="inviteCancel">暂不</button>
+      <button class="ic-confirm" id="inviteConfirm">加入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 退出达人榜确认（精简） -->
+<div class="invite-mask" id="exitMask">
+  <div class="invite-card">
+    <div class="ic-title exit">⚠️ 退出达人榜</div>
+    <div class="ic-warn">
+      退出后你的形象<b>立即从达人 Tab 移除</b>，赞数与排名照常计算，随时可再次加入。
+    </div>
+    <div class="ic-btns">
+      <button class="ic-cancel" id="exitCancel">取消</button>
+      <button class="ic-confirm exit" id="exitConfirm">确认退出</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const toast = document.getElementById('toast');
+  let tTimer = null;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(tTimer);
+    tTimer = setTimeout(()=>toast.classList.remove('show'), 1400);
+  }
+
+  const SWITCH_LABEL = {
+    'home': '首页左上角',
+    'side': '侧边栏',
+    'profile': '个人资料页',
+    'online': '在线状态',
+    'qzone': 'QQ空间',
+    'chat': '聊天对话',
+    'g-show': '群友看群秀场',
+    'g-grab': '群友抓我',
+    'g-steal': '群友偷能量',
+    'g-invite': '群友邀请',
+    'g-friend': '群友加好友',
+    't-friend': '达人加好友',
+    't-join': '加入达人榜',
+    't-case': '展柜对达人公开',
+    't-pool': '进入达人推荐池',
+    's-visible': '陌生人看形象',
+    's-friend': '陌生人加好友',
+    'ghost': '隐身模式',
+    'deny': '一键拒绝所有互动'
+  };
+
+  // 开关切换 + 联动子项
+  document.querySelectorAll('.ios-switch').forEach(sw=>{
+    if(sw.id === 'talentSwitch') return; // 达人榜开关走确认弹窗
+    sw.addEventListener('click', e=>{
+      e.stopPropagation();
+      sw.classList.toggle('on');
+      const key = sw.dataset.key;
+      const label = SWITCH_LABEL[key] || key;
+      const on = sw.classList.contains('on');
+      showToast(`${label} · 已${on ? '开启' : '关闭'}`);
+
+      // 联动子项（总开关关 → 子项禁用）
+      document.querySelectorAll(`.row.sub[data-parent="${key}"]`).forEach(sub=>{
+        sub.classList.toggle('disabled', !on);
+      });
+    });
+  });
+
+  // 选人子项（"0 个 ›"）点击
+  document.querySelectorAll('.row').forEach(row=>{
+    const arr = row.querySelector('.arr');
+    if(!arr) return;
+    row.addEventListener('click', ()=>{
+      if(row.classList.contains('disabled')){
+        showToast('请先开启上方总开关');
+        return;
+      }
+      const t = row.querySelector('.row-t').textContent.trim();
+      const parent = row.dataset.parent;
+      // 判断是黑名单（不让谁）还是白名单（允许谁）
+      const isWhitelist = t.includes('仅允许') || t.includes('允许这些');
+      showToast(`进入「${t}」选人页（${isWhitelist ? '白名单' : '黑名单'}）`);
+    });
+  });
+
+  // 黑名单入口
+  document.querySelector('.row.blocked').addEventListener('click', ()=>{
+    showToast('进入黑名单管理');
+  });
+
+  // ===== 达人榜（三处状态联动）=====
+  const tsNotTalent = document.getElementById('tsNotTalent');
+  const tsIsTalent = document.getElementById('tsIsTalent');
+  const inviteBtn = document.getElementById('inviteBtn');
+  const exitBtn = document.getElementById('exitBtn');
+  const inviteMask = document.getElementById('inviteMask');
+  const exitMask = document.getElementById('exitMask');
+  const talentEntry = document.getElementById('talentEntry');
+  const talentState = document.getElementById('talentState');
+  const talentSwitch = document.getElementById('talentSwitch');
+
+  let joined = false;
+
+  function syncTalentUI(){
+    if(joined){
+      tsNotTalent.style.display = 'none';
+      tsIsTalent.style.display = 'flex';
+      talentState.textContent = '已加入';
+      talentState.style.color = '#0a84ff';
+      talentState.style.fontWeight = '800';
+      talentSwitch.classList.add('on');
+    }else{
+      tsNotTalent.style.display = 'flex';
+      tsIsTalent.style.display = 'none';
+      talentState.textContent = '未加入';
+      talentState.style.color = '#8e93a1';
+      talentState.style.fontWeight = '400';
+      talentSwitch.classList.remove('on');
+    }
+  }
+
+  // 好友分组内的「加入达人榜」入口
+  talentEntry.addEventListener('click', e=>{
+    e.stopPropagation();
+    joined ? exitMask.classList.add('on') : inviteMask.classList.add('on');
+  });
+  // 达人榜分组开关（点击也走确认弹窗）
+  talentSwitch.addEventListener('click', e=>{
+    e.stopPropagation();
+    joined ? exitMask.classList.add('on') : inviteMask.classList.add('on');
+    setTimeout(syncTalentUI, 0);
+  });
+
+  inviteBtn.addEventListener('click', ()=>inviteMask.classList.add('on'));
+  exitBtn.addEventListener('click', ()=>exitMask.classList.add('on'));
+
+  document.getElementById('inviteCancel').addEventListener('click', ()=>{
+    inviteMask.classList.remove('on');
+    syncTalentUI();
+    showToast('暂不加入达人榜');
+  });
+  document.getElementById('inviteConfirm').addEventListener('click', ()=>{
+    inviteMask.classList.remove('on');
+    joined = true;
+    syncTalentUI();
+    showToast('\u2b50 已加入达人榜 · 形象已公开展示');
+  });
+
+  document.getElementById('exitCancel').addEventListener('click', ()=>{
+    exitMask.classList.remove('on');
+    syncTalentUI();
+  });
+  document.getElementById('exitConfirm').addEventListener('click', ()=>{
+    exitMask.classList.remove('on');
+    joined = false;
+    syncTalentUI();
+    showToast('已退出达人榜 · 形象已从达人 Tab 移除');
+  });
+
+  inviteMask.addEventListener('click', e=>{
+    if(e.target === inviteMask){ inviteMask.classList.remove('on'); syncTalentUI(); }
+  });
+  exitMask.addEventListener('click', e=>{
+    if(e.target === exitMask){ exitMask.classList.remove('on'); syncTalentUI(); }
+  });
+
+  syncTalentUI();
+
+  // 返回（回到 demo2）
+  document.querySelector('.back').addEventListener('click', ()=>{
+    if(document.referrer.includes('qqshow-demo2') || window.history.length > 1){
+      location.href = 'index.html';
+    }else{
+      showToast('返回上一层');
+    }
+  });
+</script>
+</body>
+</html>
